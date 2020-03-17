@@ -1,0 +1,57 @@
+{
+    "variables": {
+        "XCODE_INSTALL_USER": "",
+        "XCODE_INSTALL_PASSWORD": ""
+    },
+    "builders": [
+        {
+            "type": "veertu-anka",
+            "installer_app": "/Applications/Install macOS Catalina.app/",
+            "disk_size": "100G",
+            "source_vm_name": "catalina-base",
+            "vm_name": "complete"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sleep 5",
+                "set -euo pipefail",
+                
+                "echo \"---- Installing homebrew\"",
+                "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"",
+                
+                "echo \"---- Installing rbenv\"",
+                "brew install rbenv",
+                "eval \"$(rbenv init -)\"",
+                
+                "echo \"---- Installing ruby\"",
+                "rbenv install {{ user `ruby_version` }}",
+                "rbenv global {{ user `ruby_version` }}",
+                
+                "echo \"---- Installing bundler\"",
+                "gem install bundler -v {{ user `bundler_version` }} -N"
+            ]
+        },
+        {
+            "type": "shell",
+            "environment_vars": [
+                "XCODE_INSTALL_USER={{ user `XCODE_INSTALL_USER` }}",
+                "XCODE_INSTALL_PASSWORD={{ user `XCODE_INSTALL_PASSWORD` }}"
+            ],
+            "inline": [
+                "sleep 5",
+                "set -euo pipefail",
+
+                "echo \"---- Set ruby version\"",
+                "eval \"$(rbenv init -)\"",
+                "rbenv global {{ user `ruby_version` }}",
+                
+                "echo \"---- Installing xcode\"",
+                "gem install xcode-install -N",
+                "xcversion install {{ user `xcode_version` }}"
+            ]
+        }
+    ]
+}

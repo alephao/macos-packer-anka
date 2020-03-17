@@ -1,0 +1,35 @@
+{
+    "variables": {
+        "XCODE_INSTALL_USER": "",
+        "XCODE_INSTALL_PASSWORD": ""
+    },
+    "builders": [
+        {
+            "type": "veertu-anka",
+            "disk_size": "100G",
+            "source_vm_name": "ruby-base",
+            "vm_name": "xcode-base"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "environment_vars": [
+                "XCODE_INSTALL_USER={{ user `XCODE_INSTALL_USER` }}",
+                "XCODE_INSTALL_PASSWORD={{ user `XCODE_INSTALL_PASSWORD` }}"
+            ],
+            "inline": [
+                "sleep 5",
+                "set -euxo pipefail",
+
+                "echo \"---- Set ruby version\"",
+                "eval \"$(rbenv init -)\"",
+                "rbenv global {{ user `ruby_version` }}",
+                
+                "echo \"---- Installing xcode\"",
+                "gem install xcode-install -N",
+                "xcversion install {{ user `xcode_version` }}"
+            ]
+        }
+    ]
+}

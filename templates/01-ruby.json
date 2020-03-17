@@ -1,0 +1,34 @@
+{
+    "builders": [
+        {
+            "type": "veertu-anka",
+            "installer_app": "/Applications/Install macOS Catalina.app/",
+            "disk_size": "100G",
+            "source_vm_name": "catalina-base",
+            "vm_name": "ruby-base"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sleep 5",
+                "set -euo pipefail",
+                
+                "echo \"---- Installing homebrew\"",
+                "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"",
+                
+                "echo \"---- Installing rbenv\"",
+                "brew install rbenv",
+                "eval \"$(rbenv init -)\"",
+                
+                "echo \"---- Installing ruby\"",
+                "rbenv install {{ user `ruby_version` }}",
+                "rbenv global {{ user `ruby_version` }}",
+                
+                "echo \"---- Installing bundler\"",
+                "gem install bundler -v {{ user `bundler_version` }} -N"
+            ]
+        }
+    ]
+}
